@@ -13,3 +13,4 @@ __pycache__/
 .DS_Store
 e2e/.build/
 deploy/.release/
+deploy-run.log

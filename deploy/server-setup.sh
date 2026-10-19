@@ -19,7 +19,7 @@ cd /  # commands run as other users (postgres, campusbite) can't read the SSH us
 
 log "System packages"
 apt-get update -y -qq
-apt-get install -y -qq nginx postgresql redis-server python3 python3-venv curl ca-certificates openssl >/dev/null
+apt-get install -y -qq nginx postgresql redis-server curl ca-certificates openssl >/dev/null
 
 # Small instances (1 GB) can run out of memory while installing packages: add swap once.
 if ! swapon --show | grep -q . && [ "$(awk '/MemTotal/ {print $2}' /proc/meminfo)" -lt 2000000 ]; then
@@ -75,16 +75,14 @@ chown campusbite:campusbite "$ENV_FILE" && chmod 600 "$ENV_FILE"
 
 log "Python environment"
 cd "$APP/backend"
-if python3 -c 'import sys; sys.exit(0 if sys.version_info >= (3, 10) else 1)'; then
-  [ -x .venv/bin/python ] || sudo -u campusbite python3 -m venv .venv
-  sudo -u campusbite .venv/bin/pip install -q --upgrade pip
-  sudo -u campusbite .venv/bin/pip install -q -r requirements.txt
-else
-  # Old Ubuntu: get Python 3.12 through uv.
-  command -v uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin UV_NO_MODIFY_PATH=1 sh
-  [ -x .venv/bin/python ] || sudo -u campusbite env UV_PYTHON_INSTALL_DIR="$APP/.python" uv venv --python 3.12 .venv
-  sudo -u campusbite uv pip install -q --python .venv/bin/python -r requirements.txt
+# Always Python 3.12 (the version the test suites run on), whatever the distro ships:
+# new Ubuntu releases may have a Python some wheels don't support yet.
+command -v uv >/dev/null || curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=/usr/local/bin UV_NO_MODIFY_PATH=1 sh
+if [ ! -x .venv/bin/python ] || ! .venv/bin/python -c 'import sys; sys.exit(0 if sys.version_info[:2] == (3, 12) else 1)'; then
+  rm -rf .venv
+  sudo -u campusbite env UV_PYTHON_INSTALL_DIR="$APP/.python" UV_CACHE_DIR="$APP/.cache/uv" uv venv -q --python 3.12 .venv
 fi
+sudo -u campusbite env UV_CACHE_DIR="$APP/.cache/uv" uv pip install -q --python .venv/bin/python -r requirements.txt
 
 log "Migrations and first-run demo data"
 sudo -u campusbite .venv/bin/python -c "from app.migrate import upgrade_db; upgrade_db()"
