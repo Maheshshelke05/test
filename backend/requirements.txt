@@ -1,0 +1,14 @@
+fastapi==0.147.0
+uvicorn[standard]==0.54.0
+SQLAlchemy==2.1.5
+pydantic-settings==2.16.0
+psycopg[binary]==3.3.6
+redis==8.1.0
+PyJWT==2.15.1
+tzdata==2026.5
+alembic==1.20.0
+
+# tests
+pytest==9.1.1
+httpx==0.28.1
+fakeredis==2.40.0

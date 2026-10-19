@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "CampusBite",
+    "slug": "campusbite-student",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "in.campusbite.student"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#F8C81C",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "in.campusbite.student"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store"
+    ],
+    "scheme": "campusbite"
+  }
+}

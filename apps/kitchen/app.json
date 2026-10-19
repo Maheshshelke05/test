@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "CampusBite Kitchen",
+    "slug": "campusbite-kitchen",
+    "version": "1.0.0",
+    "orientation": "default",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "in.campusbite.kitchen"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#166534",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "in.campusbite.kitchen"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "CampusBite Kitchen uses the camera to scan students' pickup QR codes.",
+          "recordAudioAndroid": false
+        }
+      ]
+    ],
+    "scheme": "campusbite-kitchen"
+  }
+}

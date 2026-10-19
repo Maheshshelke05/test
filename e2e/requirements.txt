@@ -1,0 +1,6 @@
+# Install into the backend venv:  backend/.venv/Scripts/pip install -r e2e/requirements.txt
+playwright==1.64.0
+pytest==9.1.1
+httpx==0.28.1
+qrcode==8.2
+pillow==13.0.0

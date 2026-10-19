@@ -1,0 +1,52 @@
+# Postgres + Redis + API + worker.  From the repo root:
+#   docker compose -f infra/docker-compose.yml up -d --build
+#   docker compose -f infra/docker-compose.yml exec api python seed.py
+# Or only the data stores (run the API from your venv):
+#   docker compose -f infra/docker-compose.yml up -d db redis
+name: campusbite
+
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: campusbite
+      POSTGRES_PASSWORD: campusbite
+      POSTGRES_DB: campusbite
+    ports: ["127.0.0.1:5432:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U campusbite"]
+      interval: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    ports: ["127.0.0.1:6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: ../backend
+    environment: &backend-env
+      ENV: local
+      DATABASE_URL: postgresql+psycopg://campusbite:campusbite@db:5432/campusbite
+      REDIS_URL: redis://redis:6379/0
+      JWT_SECRET: local-dev-secret
+      WEBHOOK_SECRET: local-webhook-secret
+      RUN_WORKER: "false"
+    ports: ["8000:8000"]
+    depends_on:
+      db: { condition: service_healthy }
+      redis: { condition: service_healthy }
+
+  worker:
+    build: ../backend
+    command: ["python", "-m", "app.worker"]
+    environment: *backend-env
+    depends_on:
+      db: { condition: service_healthy }
+
+volumes:
+  pgdata:
